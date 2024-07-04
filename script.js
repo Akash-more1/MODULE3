@@ -1,11 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
     const apiURL = 'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=10&page=1&sparkline=false';
+    let data = [];
 
     // Fetch data using .then
     function fetchDataWithThen() {
         fetch(apiURL)
             .then(response => response.json())
-            .then(data => renderTable(data))
+            .then(apiData => {
+                data = apiData;
+                renderTable(data);
+            })
             .catch(error => console.error('Error fetching data with .then:', error));
     }
 
@@ -13,7 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
     async function fetchDataWithAsyncAwait() {
         try {
             const response = await fetch(apiURL);
-            const data = await response.json();
+            const apiData = await response.json();
+            data = apiData;
             renderTable(data);
         } catch (error) {
             console.error('Error fetching data with async/await:', error);
@@ -28,10 +33,12 @@ document.addEventListener('DOMContentLoaded', () => {
         data.forEach(crypto => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${crypto.name}</td>
+                <td><img src="${crypto.image}" alt="${crypto.name}" width="20"> ${crypto.name}</td>
                 <td>${crypto.symbol.toUpperCase()}</td>
                 <td>$${crypto.current_price.toLocaleString()}</td>
                 <td>${crypto.total_volume.toLocaleString()}</td>
+                <td>$${crypto.market_cap.toLocaleString()}</td>
+                <td>${crypto.price_change_percentage_24h.toFixed(2)}%</td>
             `;
             tableBody.appendChild(row);
         });
